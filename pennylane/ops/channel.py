@@ -306,6 +306,46 @@ class PhaseFlip(Channel):
         K1 = np.sqrt(p) * np.array([[1, 0], [0, -1]])
         return [K0, K1]
 
+class BitPhaseFlip(Channel):
+    r"""BitPhaseFlip(p, wires)
+    Single-qubit bit flip (Pauli :math:`Y`) error channel.
+
+    This channel is modelled by the following Kraus matrices:
+
+    .. math::
+        K_0 = \sqrt{1-p} \begin{bmatrix}
+                1 & 0 \\
+                0 & 1
+                \end{bmatrix}
+
+    .. math::
+        K_1 = \sqrt{p}\begin{bmatrix}
+                0 & -i  \\
+                i & 0
+                \end{bmatrix}
+
+    where :math:`p \in [0, 1]` is the probability of a bit-phase flip (Pauli :math:`Y`) error.
+
+    **Details:**
+
+    * Number of wires: 1
+    * Number of parameters: 1
+
+    Args:
+        p (float): The probability that a bit-phase flip error occurs.
+        wires (Sequence[int] or int): the wire the channel acts on
+    """
+    num_params = 1
+    num_wires = 1
+    par_domain = "R"
+    grad_method = "F"
+
+    @classmethod
+    def _kraus_matrices(cls, *params):
+        p = params[0]
+        K0 = np.sqrt(1 - p) * np.eye(2)
+        K1 = np.sqrt(p) * np.array([[0, -1j], [1j, 0]])
+        return [K0, K1]
 
 class QubitChannel(Channel):
     r"""QubitChannel(K_list, wires)
@@ -368,6 +408,7 @@ __qubit_channels__ = {
     "DepolarizingChannel",
     "BitFlip",
     "PhaseFlip",
+    "BitPhaseFlip",
     "QubitChannel",
 }
 
