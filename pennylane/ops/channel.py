@@ -347,6 +347,62 @@ class BitPhaseFlip(Channel):
         K1 = np.sqrt(p) * np.array([[0, -1j], [1j, 0]])
         return [K0, K1]
 
+class ResetError(Channel):
+    r"""ResetError(p, q, wires)
+    Single-qubit reset qauntum error channel.
+
+    This channel is modelled by the following Kraus matrices:
+
+    .. math::
+        K_0 = \sqrt{p} \begin{bmatrix}
+                1 & 0 \\
+                0 & 0
+                \end{bmatrix}
+
+    .. math::
+        K_1 = \sqrt{p}\begin{bmatrix}
+                0 & 1  \\
+                0 & 0
+                \end{bmatrix}
+
+    .. math::
+        K_2 = \sqrt{q}\begin{bmatrix}
+                0 & 0  \\
+                1 & 0
+                \end{bmatrix}
+
+    .. math::
+        K_3 = \sqrt{q}\begin{bmatrix}
+                0 & 0  \\
+                0 & 1
+                \end{bmatrix}
+
+    where :math:`p, q \in [0, 1]` are the probabilities of resetting the single quantum state to state |0 \rangle (p) and state |1 \rangle (q).
+
+    **Details:**
+
+    * Number of wires: 1
+    * Number of parameters: 2
+
+    Args:
+        p (float): The probability that the qubit is reset to state |0>.
+        q (float): The probability that the qubit is reset to state |1>.
+        wires (Sequence[int] or int): the wire the channel acts on
+    """
+    num_params = 2
+    num_wires = 1
+    par_domain = "R"
+    grad_method = "F"
+
+    @classmethod
+    def _kraus_matrices(cls, *params):
+        p,q = params
+        K0 = np.sqrt(p) * np.array([[1, 0], [0, 0]])
+        K1 = np.sqrt(p) * np.array([[0, 1], [0, 0]])
+        K2 = np.sqrt(q) * np.array([[0, 0], [1, 0]])
+        K3 = np.sqrt(q) * np.array([[0, 0], [0, 1]])
+        return [K0, K1, K2, K3]
+
 class QubitChannel(Channel):
     r"""QubitChannel(K_list, wires)
     Apply an arbitrary fixed quantum channel.
